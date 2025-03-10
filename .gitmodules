@@ -1,0 +1,3 @@
+[submodule "shadowssite/themes/henry-hugo"]
+	path = shadowssite/themes/henry-hugo
+	url = https://github.com/kaushikgopal/henry-hugo.git
