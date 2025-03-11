@@ -1,0 +1,4 @@
+theme = "ananke"
+baseURL = "https://0x626c61636b736b79.github.io/"
+languageCode = "en-us"
+title = "My Hugo Blog"
